@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="elogo.jpg" type="image/x-icon">
+  <title>Ezzflix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.jpg" type="image/x-icon">
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  
+    body {
+      background-image: linear-gradient(135deg, #1b1b1b 0%, #333 100%);
+      color: white;
+      font-family: 'Roboto', sans-serif;
+      text-align: center;
+      padding: 0;
+      margin: 0;
+      height: 100vh;
+    }
+  
+    header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+  
+    header img {
+      width: 80px;
+      margin-right: 20px;
+      animation: logoAnimation 2s ease-in-out infinite alternate;
+    }
+  
+    @keyframes logoAnimation {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  
+    h1 {
+      font-size: 3rem;
+      color: #ff9505;
+      text-shadow: 2px 2px 10px rgba(255, 149, 5, 0.6);
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+  
+    #filters {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+  
+    input[type="text"] {
+      padding: 12px;
+      width: 250px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      color: #333;
+      transition: all 0.3s ease;
+    }
+  
+    input[type="text"]:focus {
+      border: 2px solid #ff9505;
+      background-color: #fff;
+    }
+  
+    button {
+      padding: 12px 20px;
+      background-color: #ff9505;
+      border-radius: 20px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+  
+    button:hover {
+      background-color: #ff7205;
+      transform: translateY(-3px);
+    }
+  
+    #movie-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      margin-top: 30px;
+      transition: all 0.3s ease;
+    }
+  
+    .movie {
+      background-color: #444;
+      border-radius: 15px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      cursor: pointer;
+    }
+  
+    .movie img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.movie img::after {
+  content: url('placeholder.jpg'); /* Placeholder gambar jika ada */
+}
+
+  
+    .movie:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    }
+  
+    .movie:hover img {
+      transform: scale(1.1);
+    }
+  
+    .movie h3, .movie p {
+      padding: 10px;
+      color: #f4f4f4;
+    }
+  
+    .movie p {
+      font-size: 0.9rem;
+      color: #bbb;
+    }
+  
+    .movie button {
+      background-color: #ff9505;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+    }
+  
+    .movie button:hover {
+      background-color: #ff7205;
+    }
+  
+    /* Animation for fading in movie cards */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  
+    .movie {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+body.light-mode {
+  background-image: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  color: black;
+}
+
+header.light-mode {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+button {
+  background-color: #333; /* Default button */
+}
+
+body.light-mode button {
+  background-color: #ff9505;
+  color: black;
+}
+
+
+
+  </style>
+  
+  
+  <body>
+    <header>
+      <h1>Ezzflix Streaming Film</h1>
+    </header>
+
+    <button id="toggleTheme">🌙 Mode Gelap</button>
+
+  
+    <section id="filters">
+      <input type="text" id="searchTitle" placeholder="Cari film...">
+      <button onclick="filterMoviesByTitle()">🔍 Cari</button>
+    </section>
+  
+    <section id="movie-list"></section>
+  
+    <script>
+      const movies = [
+        { title: "AVENGERS ENDGAME", genre: "Misteri", year: 2022, actor: "Louis Partidge", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaw6QTsDE3d6-qOL5xMa4-JDdBNTa3uspCrg&s", link: "next.html" },
+        { title: "PENGABDI SETAN 2", genre: "Horor", year: 2022, actor: "Ratu Felisha", image: "horror.jpg", link: "pengabdi.html" },
+        { title: "AVATAR", genre: "Fiksi Ilmiah", year: 2009, actor: "Zoe Saldana", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzRZLbQXr7Qe923CyyJLBudYlQotwNiN8H_Q&s", link: "next.html" },
+        { title: "THE AVENGERS", genre: "Laga", year: 2012, actor: "Robert Downey Jr.", image: "https://upload.wikimedia.org/wikipedia/id/8/8a/The_Avengers_%282012_film%29_poster.jpg", link: "next.html" },
+        { title: "ENOLA HOLMES 2", genre: "Laga", year: 2019, actor: "Chris Evans", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAIK6IjojBjjIiOp6VL5g2b_lL38nTg3b8Pg&s", link: "next.html" },
+        { title: "DEADPOOL AND WOLVERINE", genre: "Laga", year: 2019, actor: "Chris Evans", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3aIKbP0W-3-h-LUiY8UkpooBX0WY8nDRpLw&s", link: "next.html" },
+        { title: "VENOM THE LAST DANCE", genre: "Laga", year: 2019, actor: "Chris Evans", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4__SrjmPgPCYTR54M9k_ulO0iIA1a3fMXZw&s", link: "next.html" },
+        { title: "INTERSTELLAR", genre: "Laga", year: 2019, actor: "Chris Evans", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0zt0lp-O3XdL8zzdrEvyzmcl6kOwfgbv4xQ&s", link: "next.html" },
+        { title: "SPIDERMAN NO WAY HOME", genre: "Laga", year: 2019, actor: "Chris Evans", image: "spider.jpg", link: "next.html" },
+        { title: "A MAN CALLED OTTO", genre: "Laga", year: 2019, actor: "Chris Evans", image: "https://m.media-amazon.com/images/M/MV5BZjYwMDU3NjUtNjVlYS00OWJhLWJkNTctZjUxZTU1M2Y5YWY3XkEyXkFqcGc@._V1_.jpg", link: "next.html" },
+        { title: "COCO", genre: "Laga", year: 2019, actor: "Chris Evans", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTVZAKKfalmsRh_5gnyRhJenMp0IiAEb1RkQ&s", link: "next.html" },
+        { title: "OPPENHEIMER", genre: "Laga", year: 2019, actor: "Chris Evans", image: "open.jpg", link: "next.html" },
+      ];
+  
+      function displayMovies(filteredMovies) {
+        const movieList = document.getElementById('movie-list');
+        movieList.innerHTML = '';
+        (filteredMovies || movies).forEach(movie => {
+          const movieItem = document.createElement('div');
+          movieItem.classList.add('movie');
+          movieItem.innerHTML = `
+            <img src="${movie.image}" alt="${movie.title}">
+            <h3>${movie.title}</h3>
+            <p>Genre: ${movie.genre}</p>
+            <p>Tahun: ${movie.year}</p>
+            <p>Aktor: ${movie.actor}</p>
+            <button onclick="window.location.href='${movie.link}'">Tonton</button>
+          `;
+          movieList.appendChild(movieItem);
+        });
+      }
+  
+      function filterMoviesByTitle() {
+        const searchTitle = document.getElementById('searchTitle').value.toLowerCase();
+        const filteredMovies = movies.filter(movie =>
+          movie.title.toLowerCase().includes(searchTitle)
+        );
+        displayMovies(filteredMovies);
+      }
+  
+      document.getElementById('searchTitle').addEventListener('input', filterMoviesByTitle);
+  
+      window.onload = () => {
+        displayMovies();
+      };
+
+      document.getElementById('toggleTheme').addEventListener('click', () => {
+  document.body.classList.toggle('light-mode');
+  const themeBtn = document.getElementById('toggleTheme');
+  if (document.body.classList.contains('light-mode')) {
+    themeBtn.textContent = '🌙 Mode Gelap';
+  } else {
+    themeBtn.textContent = '☀️ Mode Terang';
+  }
+});
+
+themeBtn.addEventListener('click', () => {
+  document.body.classList.toggle('light-mode');
+  const isLightMode = document.body.classList.contains('light-mode');
+  localStorage.setItem('theme', isLightMode ? 'light-mode' : 'dark-mode');
+  themeBtn.textContent = isLightMode ? '🌙 Mode Gelap' : '☀️ Mode Terang';
+});
+
+
+    </script>
+  </body>
+  
+</html>
