@@ -30,12 +30,13 @@
   align-items: center;
   justify-content: center;
   padding: 15px;
-  background: rgba(0, 0, 0, 0.8);
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 10;
   flex-wrap: wrap;
 }
+
+
 
   
     header img {
@@ -111,7 +112,7 @@
   
     .movie {
       background-color: #444;
-      border-radius: 15px;
+      border-radius: 10px;
       overflow: hidden;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       position: relative;
@@ -163,6 +164,11 @@
       transform: translateX(-50%);
       width: 80%;
     }
+    
+    #movie-list {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Ukuran lebih kecil */
+    gap: 15px; /* Mengurangi jarak antar film */
+  }
   
     .movie button:hover {
       background-color: #ff7205;
@@ -201,6 +207,33 @@ body.light-mode button {
   color: black;
 }
 
+#loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  display: none; /* Default: tidak terlihat */
+}
+
+.spinner {
+  border: 8px solid rgba(255, 255, 255, 0.3);
+  border-top: 8px solid #ff9505;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
 
   </style>
@@ -220,11 +253,15 @@ body.light-mode button {
     </section>
   
     <section id="movie-list"></section>
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+    
   
     <script>
       const movies = [
         { title: "AVENGERS ENDGAME", genre: "Misteri", year: 2022, actor: "Louis Partidge", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaw6QTsDE3d6-qOL5xMa4-JDdBNTa3uspCrg&s", link: "next.html" },
-        { title: "PENGABDI SETAN 2", genre: "Horor", year: 2022, actor: "Ratu Felisha", image: "horror.jpg", link: "pengabdi.html" },
+        { title: "PENGABDI SETAN 2", genre: "Horor", year: 2022, actor: "Ratu Felisha", image: "horror.jpg", link: "next.html" },
         { title: "AVATAR", genre: "Fiksi Ilmiah", year: 2009, actor: "Zoe Saldana", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzRZLbQXr7Qe923CyyJLBudYlQotwNiN8H_Q&s", link: "next.html" },
         { title: "THE AVENGERS", genre: "Laga", year: 2012, actor: "Robert Downey Jr.", image: "https://upload.wikimedia.org/wikipedia/id/8/8a/The_Avengers_%282012_film%29_poster.jpg", link: "next.html" },
         { title: "ENOLA HOLMES 2", genre: "Laga", year: 2019, actor: "Chris Evans", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAIK6IjojBjjIiOp6VL5g2b_lL38nTg3b8Pg&s", link: "next.html" },
@@ -237,55 +274,71 @@ body.light-mode button {
         { title: "OPPENHEIMER", genre: "Laga", year: 2019, actor: "Chris Evans", image: "open.jpg", link: "next.html" },
       ];
   
-      function displayMovies(filteredMovies) {
+       // Fungsi untuk menampilkan film
+    function displayMovies(filteredMovies = movies) {
         const movieList = document.getElementById('movie-list');
         movieList.innerHTML = '';
-        (filteredMovies || movies).forEach(movie => {
-          const movieItem = document.createElement('div');
-          movieItem.classList.add('movie');
-          movieItem.innerHTML = `
-            <img src="${movie.image}" alt="${movie.title}">
-            <h3>${movie.title}</h3>
-            <p>Genre: ${movie.genre}</p>
-            <p>Tahun: ${movie.year}</p>
-            <p>Aktor: ${movie.actor}</p>
-            <button onclick="window.location.href='${movie.link}'">Tonton</button>
-          `;
-          movieList.appendChild(movieItem);
+        filteredMovies.forEach(movie => {
+            const movieItem = document.createElement('div');
+            movieItem.classList.add('movie');
+            movieItem.innerHTML = `
+                <img src="${movie.image}" alt="${movie.title}" onerror="this.src='placeholder.jpg'">
+                <h3>${movie.title}</h3>
+                <p>Genre: ${movie.genre}</p>
+                <p>Tahun: ${movie.year}</p>
+                <p>Aktor: ${movie.actor}</p>
+                <button onclick="showLoadingAndRedirect('${movie.link}')">Tonton</button>
+            `;
+            movieList.appendChild(movieItem);
         });
-      }
-  
-      function filterMoviesByTitle() {
+    }
+
+    // Fungsi untuk filter film berdasarkan judul
+    function filterMoviesByTitle() {
         const searchTitle = document.getElementById('searchTitle').value.toLowerCase();
-        const filteredMovies = movies.filter(movie =>
-          movie.title.toLowerCase().includes(searchTitle)
-        );
+        const filteredMovies = searchTitle
+            ? movies.filter(movie => movie.title.toLowerCase().includes(searchTitle))
+            : movies;
         displayMovies(filteredMovies);
-      }
-  
-      document.getElementById('searchTitle').addEventListener('input', filterMoviesByTitle);
-  
-      window.onload = () => {
+    }
+
+    // Fungsi untuk menunjukkan loading dan redirect ke halaman film
+    function showLoadingAndRedirect(link) {
+        sessionStorage.setItem('loading', 'true'); // Set status loading
+        document.getElementById('loading-overlay').style.display = 'flex';
+        setTimeout(() => { 
+            window.location.href = link; 
+        }, 2000);
+    }
+
+    // Saat halaman di-load penuh
+    document.addEventListener('DOMContentLoaded', () => {
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        // Periksa jika halaman sebelumnya mengatur status loading
+        if (sessionStorage.getItem('loading') === 'true') {
+            loadingOverlay.style.display = 'none';
+            sessionStorage.removeItem('loading'); // Hapus status loading setelah overlay disembunyikan
+        }
+        
+        // Atur tema jika disimpan di localStorage
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light-mode') {
+            document.body.classList.add('light-mode');
+            document.getElementById('toggleTheme').textContent = '🌙 Mode Gelap';
+        }
+        
+        // Tampilkan daftar film
         displayMovies();
-      };
+    });
 
-      document.getElementById('toggleTheme').addEventListener('click', () => {
-  document.body.classList.toggle('light-mode');
-  const themeBtn = document.getElementById('toggleTheme');
-  if (document.body.classList.contains('light-mode')) {
-    themeBtn.textContent = '🌙 Mode Gelap';
-  } else {
-    themeBtn.textContent = '☀️ Mode Terang';
-  }
-});
-
-themeBtn.addEventListener('click', () => {
-  document.body.classList.toggle('light-mode');
-  const isLightMode = document.body.classList.contains('light-mode');
-  localStorage.setItem('theme', isLightMode ? 'light-mode' : 'dark-mode');
-  themeBtn.textContent = isLightMode ? '🌙 Mode Gelap' : '☀️ Mode Terang';
-});
-
+    // Fungsi toggle tema
+    document.getElementById('toggleTheme').onclick = () => {
+        document.body.classList.toggle('light-mode');
+        const isLightMode = document.body.classList.contains('light-mode');
+        localStorage.setItem('theme', isLightMode ? 'light-mode' : '');
+        document.getElementById('toggleTheme').textContent = isLightMode ? '🌙 Mode Gelap' : '🌞 Mode Terang';
+    };
 
     </script>
   </body>
