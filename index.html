@@ -311,24 +311,25 @@ body.light-mode button {
         }, 2000);
     }
 
+    // Fungsi untuk menghapus overlay saat kembali ke halaman
+    function handlePageShow(event) {
+        if (event.persisted || sessionStorage.getItem('loading') === 'true') {
+            document.getElementById('loading-overlay').style.display = 'none';
+            sessionStorage.removeItem('loading');
+        }
+    }
+
+    // Event `pageshow` untuk memastikan overlay dihapus saat kembali ke halaman
+    window.addEventListener('pageshow', handlePageShow);
+
     // Saat halaman di-load penuh
     document.addEventListener('DOMContentLoaded', () => {
-        const loadingOverlay = document.getElementById('loading-overlay');
-
-        // Periksa jika halaman sebelumnya mengatur status loading
-        if (sessionStorage.getItem('loading') === 'true') {
-            loadingOverlay.style.display = 'none';
-            sessionStorage.removeItem('loading'); // Hapus status loading setelah overlay disembunyikan
-        }
-        
-        // Atur tema jika disimpan di localStorage
         const theme = localStorage.getItem('theme');
         if (theme === 'light-mode') {
             document.body.classList.add('light-mode');
             document.getElementById('toggleTheme').textContent = '🌙 Mode Gelap';
         }
-        
-        // Tampilkan daftar film
+
         displayMovies();
     });
 
